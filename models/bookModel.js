@@ -30,6 +30,10 @@ const bookSchema = new mongoose.Schema({
     number_of_reads:Number,
     bookName:String,
     description:String,
+    author_name:String,
+    published_date:String,
+    views:String
+
     
 })
 
