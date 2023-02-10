@@ -16,6 +16,9 @@ exports.addBook = async (req,res)=>{
         const number_of_reads= req.body.number_of_reads
         const bookName = req.body.bookName;
         const description = req.body.description;
+        const author_name= req.body.author_name;
+        const published_date= req.body.published_date;
+        const views = req.body.views;
 
         var notificationResponse ={};
 
@@ -59,7 +62,10 @@ exports.addBook = async (req,res)=>{
                         image:image,
                         file:req.files.file[0].path,
                         bookName:bookName,
-                        description:description
+                        description:description,
+                        author_name:author_name,
+                        published_date:published_date,
+                        views:views
                     });
                     
                     const result =await book.save()
@@ -298,6 +304,11 @@ exports.updateBook= async (req ,res) => {
         const number_of_reads= req.body.number_of_reads
         const bookName = req.body.bookName;
         const description = req.body.description;
+        const author_name= req.body.author_name;
+        const published_date= req.body.published_date;
+        const views = req.body.views;
+
+        
 
         var fileFound;
         var imageFound;
@@ -370,7 +381,11 @@ exports.updateBook= async (req ,res) => {
                         image:image,
                         file:file,
                         bookName:bookName,
-                        description:description
+                        description:description,
+                        author_name:author_name,
+                        published_date:published_date,
+                        views:views
+                        
             },
             {
                 new:true
@@ -435,11 +450,11 @@ exports.searchBook = async (req,res)=>{
 
 exports.getAllTrendingBooks = async (req,res)=>{
     try{
-        const result = await bookModel.find().sort({rating:-1});
+        const result = await bookModel.find().sort({rating:-1}).limit(8);
 
         if(result){
             res.json({
-                message:"All trending Books fetched",
+                message:"All trending Books fetched , records are limited to 8",
                 result:result,
                 status:true,
                 statusCode:201
@@ -484,6 +499,117 @@ exports.getBooksByCategory_id= async (req,res)=>{
             res.json({
                 message:"could not fetch books",
                 status:false,
+            })
+        }
+    }
+    catch(err){
+        res.json({
+            message: "Error Occurred while fetching books",
+            error:err.message,
+            status:false
+        })
+    }
+}
+
+exports.getEBooksByCategory_id= async (req,res)=>{
+    try{
+        const category_id = req.query.category_id
+        if(!category_id){
+            return(
+                res.json({
+                    message: "please provide category_id",
+                    status:false
+                })
+            )
+        }
+        const result = await bookModel.find({category_id:category_id , bookType:'ebook' }).populate('category_id');
+        if(result){
+            res.json({
+                message:"EBooks with this category fetched",
+                result:result,
+                status:true,
+                statusCode:201
+            })
+        }
+        else{
+            res.json({
+                message:"could not fetch Ebooks",
+                status:false,
+            })
+        }
+    }
+    catch(err){
+        res.json({
+            message: "Error Occurred while fetching Ebooks",
+            error:err.message,
+            status:false
+        })
+    }
+}
+
+exports.getAudioBooksByCategory_id= async (req,res)=>{
+    try{
+        const category_id = req.query.category_id
+        if(!category_id){
+            return(
+                res.json({
+                    message: "please provide category_id",
+                    status:false
+                })
+            )
+        }
+        const result = await bookModel.find({category_id:category_id , bookType:'audio' }).populate('category_id');
+        if(result){
+            res.json({
+                message:"Audio Books with this category fetched",
+                result:result,
+                status:true,
+                statusCode:201
+            })
+        }
+        else{
+            res.json({
+                message:"could not fetch audio books",
+                status:false,
+            })
+        }
+    }
+    catch(err){
+        res.json({
+            message: "Error Occurred while fetching books",
+            error:err.message,
+            status:false
+        })
+    }
+}
+
+
+exports.searchBook_by_author_name = async (req,res)=>{
+    try{
+        try{
+            const text = req.query.text;
+    
+            const result = await bookModel.find({author_name: {$regex:text , $options:'i'}});
+            if(result){
+                res.json({
+                    message:"Books fetched with this author name",
+                    result:result,
+                    status:true,
+                    statusCode:201
+                })
+            }
+            else{
+                res.json({
+                    message:"could not fetch books",
+                    status:false,
+                })
+            }
+        }
+        catch(err){
+            res.json({
+                message: "Error Occurred while fetching books",
+                error:err.message,
+                status:false
             })
         }
     }
