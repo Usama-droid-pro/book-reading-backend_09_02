@@ -1,6 +1,6 @@
 
 const mongoose = require("mongoose")
-const terms_conditionsModel = require("../models/privacy_policyModel")
+const terms_conditionsModel = require("../models/terms&conditionsModel")
 
 
 exports.createTerms_conditions = async (req,res)=>{

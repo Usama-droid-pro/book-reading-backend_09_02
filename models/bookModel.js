@@ -32,7 +32,7 @@ const bookSchema = new mongoose.Schema({
     description:String,
     author_name:String,
     published_date:String,
-    views:String
+    views:Number
 
     
 })
