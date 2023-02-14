@@ -38,6 +38,10 @@ router.get("/getBooksByCategory_id",controller.getBooksByCategory_id)
 router.get("/getEBooksByCategory_id",controller.getEBooksByCategory_id)
 router.get("/getAudioBooksByCategory_id",controller.getAudioBooksByCategory_id)
 router.get("/searchBook_by_author_name",controller.searchBook_by_author_name)
+router.put("/addViewToBook",controller.addViewToBook)
+router.get("/getViewersOfBook",controller.getViewersOfBook)
+
+
 
 
 

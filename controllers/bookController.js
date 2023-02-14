@@ -3,6 +3,7 @@ const mongoose =require("mongoose");
 const fs= require("fs");
 const notification = require("../utils/notification")
 const { ifError } = require("assert");
+const viewModel = require('../models/viewModel');
 
 exports.addBook = async (req,res)=>{
     try{
@@ -18,7 +19,6 @@ exports.addBook = async (req,res)=>{
         const description = req.body.description;
         const author_name= req.body.author_name;
         const published_date= req.body.published_date;
-        const views = req.body.views;
 
         var notificationResponse ={};
 
@@ -65,7 +65,7 @@ exports.addBook = async (req,res)=>{
                         description:description,
                         author_name:author_name,
                         published_date:published_date,
-                        views:views
+                        views:0
                     });
                     
                     const result =await book.save()
@@ -306,7 +306,6 @@ exports.updateBook= async (req ,res) => {
         const description = req.body.description;
         const author_name= req.body.author_name;
         const published_date= req.body.published_date;
-        const views = req.body.views;
 
         
 
@@ -384,7 +383,6 @@ exports.updateBook= async (req ,res) => {
                         description:description,
                         author_name:author_name,
                         published_date:published_date,
-                        views:views
                         
             },
             {
@@ -622,6 +620,92 @@ exports.searchBook_by_author_name = async (req,res)=>{
     }
 }
 
+
+exports.addViewToBook = async (req,res)=>{
+    try{
+        const book_id = req.body.book_id;
+        const user_id = req.body.user_id;
+        if(!book_id || !user_id){
+            return(
+                res.json({
+                    message: "Book id and user id must be provided",
+                    status:false
+                })
+            )
+        }
+
+        const viewed = await viewModel.findOne({ user_id:user_id, book_id:book_id });
+        if(!viewed){
+            const result =await bookModel.findOneAndUpdate({_id:book_id} , {$inc:{views:1}} , {new:true});
+
+            
+           let view =  new viewModel({
+                _id:mongoose.Types.ObjectId(),
+                user_id:user_id,
+                book_id:book_id
+            });
+            let viewSaved= await view.save();
+
+            if(viewSaved){
+               console.log('view of this user added')
+            }
+
+            if(result){
+                res.json({
+                    message: "Book view Incremented",
+                    result:result,
+                    status:true
+                })
+            }
+
+
+        }
+        else{
+            res.json({
+                message: "Do Nothing, This User already given view to this book",
+                status:false
+            })
+        }
+    }
+    catch(err){
+        res.json({
+            message: "error Occurred",
+            status:false,
+            error:err.message
+        })
+    }
+}
+
+exports.getViewersOfBook = async(req,res)=>{
+    try{
+        const book_id = req.query.book_id;
+        
+        const result = await viewModel.find({book_id:book_id}).populate('book_id').populate('user_id');
+
+        if(result){
+            res.json({
+                message: "All Users who view this this book",
+                result:result,
+                status:true
+            })
+        }
+        else{
+
+                res.json({
+                    message: "could not fetch users",
+                    status:false
+                })
+
+        }
+    }
+    catch(err){
+        res.json({
+            message: "error Occurred",
+            status:false,
+            error:err.message
+        })
+}
+}
 //functions
 async function deleteImage(foundResult)
 {
