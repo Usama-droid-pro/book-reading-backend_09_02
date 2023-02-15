@@ -51,6 +51,8 @@ app.use("/purchasedBookList" , require("./routes/purchasedBooksListRoute"))
 app.use("/downloadedBooksList" , require("./routes/downloadedBooksListRoute"))
 app.use("/aboutUs" , require("./routes/aboutUsRoute"))
 app.use("/notification" , require("./routes/notificationRoute"))
+app.use("/rating" , require("./routes/bookRatingRoute"))
+
 
 
 

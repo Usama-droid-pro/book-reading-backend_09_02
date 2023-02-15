@@ -13,7 +13,8 @@ const bookSchema = new mongoose.Schema({
         type:String
     },
     rating:{
-        type:String
+        type:Number,
+        default:0
     },
     paid:{
         type:Boolean
@@ -32,9 +33,15 @@ const bookSchema = new mongoose.Schema({
     description:String,
     author_name:String,
     published_date:String,
-    views:Number
-
-    
+    views:Number,
+    date:{
+        type:Date,
+        default:new Date(Date.now())
+    },
+    number_of_ratings:{
+        type:Number,
+        default:0
+    }
 })
 
 module.exports = mongoose.model("book" , bookSchema);

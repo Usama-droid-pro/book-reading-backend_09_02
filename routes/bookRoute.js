@@ -40,13 +40,7 @@ router.get("/getAudioBooksByCategory_id",controller.getAudioBooksByCategory_id)
 router.get("/searchBook_by_author_name",controller.searchBook_by_author_name)
 router.put("/addViewToBook",controller.addViewToBook)
 router.get("/getViewersOfBook",controller.getViewersOfBook)
-
-
-
-
-
-
-
+router.get('/getMonthsAndBookCount' , controller.getMonthsAndBookCount)
 
 
 

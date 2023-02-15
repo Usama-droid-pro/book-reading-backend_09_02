@@ -8,7 +8,6 @@ const viewModel = require('../models/viewModel');
 exports.addBook = async (req,res)=>{
     try{
         const category_id = req.body.category_id;
-        const rating= req.body.rating;
         const paid = req.body.paid;
         const price = req.body.price;
         const bookType = req.body.bookType;
@@ -52,7 +51,6 @@ exports.addBook = async (req,res)=>{
                     const book = new bookModel({
                         _id:mongoose.Types.ObjectId(),
                         category_id:category_id,
-                        rating:rating,
                         chapters:chapters,
                         numberOfPages:numberOfPages,
                         number_of_reads:number_of_reads,
@@ -706,6 +704,102 @@ exports.getViewersOfBook = async(req,res)=>{
         })
 }
 }
+
+exports.getMonthsAndBookCount = async (req,res)=>{
+    try{
+        let year = req.query.year;
+
+        if(!year){
+            return(
+                res.json({
+                    message:"Please provide year as a input",
+                    status:false
+                })
+            )
+        }
+        year= parseInt(year)
+
+        const pipeline =[
+            {
+                $match:{
+                    date: {
+                        $gte: new Date(year, 0, 1),
+                        $lte: new Date(year, 11, 31),
+                      }
+                }
+            },
+            {
+                $group:{
+                    _id:{month:{$month : '$date'} , bookType:'$bookType'},
+                    count:{$sum: 1}
+                }
+            },
+            {
+                $group:{
+                   _id:'$_id.month',
+                   total_audio_books :{
+                    $sum:{
+                        $cond:[{
+                            $eq:['$_id.bookType' , 'audio'],
+                        },
+                        '$count',
+                        0
+                    ]
+                    }
+                   },total_e_books :{
+                    $sum:{
+                        $cond:[{
+                            $eq:['$_id.bookType' , 'ebook'],
+                        },
+                        '$count',
+                        0
+                    ]
+                    }
+                   }
+                }
+            },
+
+
+            {
+                $sort: {
+                  '_id': 1,
+                },
+              },
+            {
+                $project:{
+                    _id:0,
+                    month:'$_id',
+                    total_audio_books:1,
+                    total_e_books:1
+                }
+            }
+        ];
+
+        const result = await bookModel.aggregate(pipeline);
+
+        if(result){
+            res.json({
+                message: "Result fetched",
+                result:result,
+                status:true
+            })
+        }
+        else{
+            res.json({
+                message: "Could not fetch the result",
+                status:false
+            })
+        }
+    }
+    catch(err){
+        res.json({
+            message: "Error occurred",
+            error:err.message
+        })
+    }
+}
+
+
 //functions
 async function deleteImage(foundResult)
 {
